@@ -133,7 +133,12 @@ while True:
 
     item_name = not_blank("Item name: ")
 
-    if item_name == "xxx":
+    # check users enter at least one item name
+    if len(all_names) == 0:
+        print("You need at least one item")
+        continue
+
+    elif item_name == "xxx":
         break
 
     item_weight = unit_chooser("Item weight: ")
@@ -154,25 +159,19 @@ while True:
 
 
 print(f"Your budget is ${budget}.")
-print("name", all_names,
-  ",Kg", all_weight,
-  ",costs", all_costs,
-  ",grams", all_grams,
-  ",unit costs", all_unit_costs)
+print(f"name - {all_names} "
+      f"Kg - {all_weight} "
+      f"costs - {all_costs} "
+      f"grams - {all_grams} "
+      f"unit costs - {all_unit_costs}")
 
 # Find the lowest unit cost
 lowest = min(all_unit_costs)
 
-# Find the index (position) of that lowest cost
-lowest_index = all_unit_costs.index(lowest)
-
-# Use the index to get the corresponding item name
-best_item = all_names[lowest_index]
 
 print(f"\n--- Results ---")
 print(f"Your budget is ${budget:.2f}")
 print(f"The lowest unit cost is ${lowest:.2f} per kg")
-print(f"This is for: {best_item}")
 
 lowest = min(all_unit_costs)
 print(f"This is the lowest {lowest:.2f}")
