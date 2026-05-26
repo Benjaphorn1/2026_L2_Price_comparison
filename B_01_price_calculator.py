@@ -88,64 +88,99 @@ same name as today's date and your chosen file name.
 
     ''')
 
-def unit_chooser(question):
-    """Calculates whether the weight is g or kg"""
-    # Initialise variables and error message
-    error = "Please enter a valid weight\n"
+def get_input(question):
+    """Gets number and detects unit if its entered"""
 
-    valid = False
-    while not valid:
+    while True:
 
-        # ask user for weight...
-        response = input(question)
+        response = input(question).lower().strip()
 
-        # check if second to last character is k...
+        # kilograms
         if response.endswith("kg"):
-            weight_type = "kg"
+            unit = "kg"
             amount = response[:-2]
 
+        # grams
         elif response.endswith("g"):
-            weight_type = "g"
+            unit = "g"
             amount = response[:-1]
 
+        # millilitres
+        elif response.endswith("ml"):
+            unit = "ml"
+            amount = response[:-2]
+
+        # litres
+        elif response.endswith("l"):
+            unit = "l"
+            amount = response[:-1]
+
+        # no unit entered
         else:
-            weight_type = "unknown"
+            unit = "unknown"
             amount = response
 
+        # Check amount is a valid input
         try:
             amount = float(amount)
+
             if amount <= 0:
-                print(error)
+                print("Amount must be more than 0")
                 continue
 
+            # send values back to main routine
+            return amount, unit
 
         except ValueError:
-            print(error)
-            continue
+            print("Please enter a valid amount")
 
-        if weight_type == "unknown" and amount >= 100:
-            gram_type = yes_no_check(f"Do you mean {amount}g. y/n: ")
+def unit_pick(amount):
+    """Decides unit if user didn't enter one"""
 
-            # Set weight type base on user and answer above
-            if gram_type == "yes":
-                weight_type = "g"
+    # Large values above 100 asked if g or ml
+    if amount > 100:
+
+        while True:
+            response = input("Is this grams g or millilitres ml? ").lower()
+
+            if response in ["g", "grams"]:
+                return "g"
+
+            elif response in ["ml", "millilitres"]:
+                return "ml"
+
             else:
-                weight_type = "kg"
+                print("Please enter g or ml")
 
-        elif weight_type == "unknown" and amount < 100:
-            kilogram_type = yes_no_check(f"Do you mean {amount}kg?, y/n: ")
-            if kilogram_type == "yes":
-                weight_type = "kg"
+    # Smaller values asked if kg or l
+    else:
+
+        while True:
+            response = input("Is this kilograms kg or litres L? ").lower()
+
+            if response in ["kg", "kilograms"]:
+                return "kg"
+
+            elif response in ["l", "litres"]:
+                return "l"
+
             else:
-                weight_type = "g"
+                print("Please enter kg or L")
 
-        # convert grams to kg if the user enters grams
-        if weight_type == "kg":
-            return amount
-        else:
-            unit_weight = (amount/1000)
-            return unit_weight
+def convert_units(amount, unit):
+    """Converts everything to kg or L"""
 
+    if unit == "g":
+        return amount / 1000, "kg"
+
+    elif unit == "ml":
+        return amount / 1000, "L"
+
+    elif unit == "kg":
+        return amount, "kg"
+
+    elif unit == "l":
+        return amount, "L"
 
 # Main routine goes here
 
@@ -168,51 +203,68 @@ if want_instructions == "yes":
 print()
 
 budget = num_check("What is the budget? ")
-#Main Routine loop
+
+# Main Routine loop
 while True:
 
     item_name = not_blank("Item name: ")
 
-
+    # Exit code
     if item_name == "xxx":
         break
 
-    item_weight = unit_chooser("Item weight: ")
+    # Get item amount and unit
+    amount, unit = get_input("Item weight or volume: ")
+
+    # Ask user for unit if not entered
+    if unit == "unknown":
+        unit = unit_pick(amount)
+
+    # Convert units to kg / L
+    item_weight, new_unit = convert_units(amount, unit)
+
+    # Get item cost
     item_cost = num_check("Item cost: $", "float")
 
-    unit_cost = item_cost / item_weight
-    grams = item_weight * 1000
 
-    print(f"{item_name}: {grams:.0f}g ({item_weight:.2f}kg)")
-    print(f"Unit cost: ${unit_cost:.2f} per kg")
+    # Calculate unit cost
+    unit_cost = item_cost / item_weight
+
+    # Display item info
+    print(f"{item_name}: {item_weight:.2f}{new_unit}")
+    print(f"Unit cost: ${unit_cost:.2f} per {new_unit}")
     print()
 
+    # Add data to lists
     all_names.append(item_name)
     all_weight.append(item_weight)
-    all_grams.append(grams)
     all_costs.append(item_cost)
     all_unit_costs.append(unit_cost)
 
-
-print(f"Your budget is ${budget}.")
-print(f"name - {all_names} "
-      f"Kg - {all_weight} "
-      f"costs - {all_costs} "
-      f"grams - {all_grams} "
-      f"unit costs - {all_unit_costs}")
-
-# Find the lowest unit cost
-lowest = min(all_unit_costs)
-
-# check users enter at least one item name
+# Check at least one item entered
 if len(all_names) == 0:
-    print("You need at least one item")
+    print("You need to enter at least one item.")
 
-print(f"\n--- Results ---")
-print(f"Your budget is ${budget:.2f}")
+else:
 
+# Output results
+    make_statement("results","=")
+    print(f"Your budget is ${budget:.2f}")
 
+    print(f"name - {all_names}")
+    print(f"Kg/L - {all_weight}")
+    print(f"costs - {all_costs}")
+    print(f"unit costs - {all_unit_costs}")
 
-
-
-
+    # # Find lowest unit cost
+    # lowest = min(all_unit_costs)
+    #
+    # # Find index of lowest cost item
+    # best_index = all_unit_costs.index(lowest)
+    #
+    # # Get best item name
+    # best_item = all_names[best_index]
+    #
+    # print()
+    # print(f"Best value item: {best_item}")
+    # print(f"Unit cost: ${lowest:.2f} per kg/L")
