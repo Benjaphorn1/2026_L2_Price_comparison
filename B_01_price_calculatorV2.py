@@ -257,12 +257,20 @@ while True:
     # add names and unit cost to one list for comparison
     names_unit_costs.append((item_name, unit_cost))
 
+
+
 # Check at least one item entered
 if len(all_names) == 0:
     print("You need to enter at least one item.")
 else:
     # return function
     cheapest_price, cheapest_name = comparison_function(names_unit_costs)
+
+    # Get position of cheapest item in lists
+    item_price_index = all_names.index(cheapest_name)
+
+    # Retrieve original cost using that position
+    item_price = all_costs[item_price_index]
 
     # Output results
     make_statement("results","=")
@@ -274,11 +282,11 @@ else:
     print(f"unit costs - {all_unit_costs}")
 
     # if the cheapest item is higher than the budget output message
-    # if cheapest_price > budget:
-    #     print()
-    #     print("Nothing is within your budget")
-    #     print(f"But Item {cheapest_name} is the cheapest at ${cheapest_price:.2f}")
-    # # output results
-    # else:
-    print(f"\nCheapest item is {cheapest_name} at ${cheapest_price:.2f}")
-
+    if cheapest_price > budget:
+        print()
+        print("Nothing is within your budget")
+        print(f"\nCheapest item is {cheapest_name} at ${cheapest_price:.2f} per unit for a price of ${item_price:.0f}")
+    # output results
+    else:
+        # Display recommendation to user
+        print(f"\nCheapest item is {cheapest_name} at ${cheapest_price:.2f} per unti for a price of ${item_price:.0f}")
