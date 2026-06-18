@@ -1,11 +1,13 @@
 import pandas
 from tabulate import tabulate
+from datetime import date
 
 def make_statement(statement, decoration):
     """Emphasises headings by adding decoration
     at the start and end"""
-
-    print(f"{decoration * 3} {statement} {decoration * 3}")
+    # Create the string and return it
+    heading = f"{decoration * 3} {statement} {decoration * 3}"
+    return heading
 
 def not_blank(question):
     """Checks that a user response is not blank"""
@@ -205,17 +207,22 @@ def format_currency(value):
     """Formats a number into a dollar currency string"""
     return f"${value:.2f}"
 
+def format_weight(value):
+    """Formats a number to 2 decimal places for weight/volume"""
+    return f"{value:.2f}"
+
 # Main routine goes here
 
 #lists
 all_names = []
 all_weight = []
+all_final_units = []
 all_costs = []
 all_grams = []
 all_unit_costs = []
 names_unit_costs = []
 
-make_statement("Price Comparison Calculator", "💲")
+print(make_statement("Price Comparison Calculator", "💲"))
 
 # Print instructions if user says yes
 print()
@@ -227,6 +234,10 @@ if want_instructions == "yes":
 print()
 
 budget = num_check("What is the budget? ", "float", "xxx")
+print()
+
+file_name = not_blank("File name: ")
+print()
 
 # Main Routine loop
 while True:
@@ -260,6 +271,7 @@ while True:
     # Add data to lists
     all_names.append(item_name)
     all_weight.append(item_weight)
+    all_final_units.append(new_unit)
     all_costs.append(item_cost)
     all_unit_costs.append(unit_cost)
     # add names and unit cost to one list for comparison
@@ -278,40 +290,85 @@ else:
     # get the original cost using that position
     item_price = all_costs[item_price_position]
 
-    # Output results
-    make_statement("Results", "=")
-    print()
-    print(f"Your budget is ${budget:.2f}")
-    print()
+    # variable for table to prevent error
+    weight_colm = "Unit Weight/Vol"
 
-    # pandas output goes here
+    # pandas output dictionary setup
     price_calc_dict = {
-        'Name': all_names,
-        'Unit Weight': all_weight,
-        'Item costs': all_costs,
-        'Unit Costs': all_unit_costs
+        "Name": all_names,
+        weight_colm: all_weight,
+        "Unit": all_final_units,
+        "Item costs": all_costs,
+        "Unit Costs": all_unit_costs,
     }
 
     # Convert to Dataframe format numbers to currency and print grid table
     calc_frame = pandas.DataFrame(price_calc_dict)
 
-    calc_frame['Unit Weight'] = calc_frame['Unit Weight']
-    calc_frame['Item costs'] = calc_frame['Item costs'].apply(format_currency)
-    calc_frame['Unit Costs'] = calc_frame['Unit Costs'].apply(format_currency)
+    # Formatted safely using the variable name
+    calc_frame[weight_colm] = calc_frame[weight_colm].apply(format_weight)
+    calc_frame["Item costs"] = calc_frame["Item costs"].apply(format_currency)
+    calc_frame["Unit Costs"] = calc_frame["Unit Costs"].apply(format_currency)
 
-    expense_string = tabulate(calc_frame, headers='keys', tablefmt='grid', showindex=False)
-    print(expense_string)
+    expense_string = tabulate(
+        calc_frame, headers="keys", tablefmt="grid", showindex=False
+    )
 
-    # if the cheapest item is higher than the budget output message
+    # Get date for heading and filename
+    today = date.today()
+
+    day = today.strftime("%d")
+    month = today.strftime("%m")
+    year = today.strftime("%Y")
+
+    main_heading = make_statement(
+        f"Price Comparison Calculator ({day}/{month}/{year})", "="
+    )
+    results_heading = make_statement("Results", "=")
+    budget_string = f"Your budget is ${budget:.2f}\n"
+
+    recommendation_heading = make_statement(
+        "Recommendation", "="
+    )
+
     if item_price > budget:
-        print()
-        print("Nothing is within your budget")
-        print(f"Cheapest item is: {cheapest_name}")
-        print(f"Cheapest item unit price: ${cheapest_price:.2f}")
-        print(f"Item  price is ${item_price:.0f}")
-    # output results
+        recommendation_string = (
+            f"Nothing is within your budget\n"
+            f"Cheapest item: {cheapest_name}\n"
+            f"Unit price: ${cheapest_price:.2f}\n"
+            f"Item price: ${item_price:.2f}"
+        )
     else:
-        # Display recommendation to user
-        print(f"Cheapest item is: {cheapest_name}")
-        print(f"Cheapest item unit price: ${cheapest_price:.2f}")
-        print(f"Cheapest item price is: ${item_price:.0f}")
+        recommendation_string = (
+            f"Recommended item: {cheapest_name}\n"
+            f"Unit price: ${cheapest_price:.2f}\n"
+            f"Item price: ${item_price:.2f}"
+        )
+
+    to_write = [
+        main_heading,
+        results_heading,
+        budget_string,
+        expense_string,
+        "\n",
+        recommendation_heading,
+        recommendation_string,
+    ]
+
+    print()
+    for item in to_write:
+        print(item)
+
+    # Create filename
+    file_name = f"{file_name}_{year}_{month}_{day}"
+    write_to = "{}.txt".format(file_name)
+
+    # Create file
+    text_file = open(write_to, "w+")
+
+    # Write items to file
+    for item in to_write:
+        text_file.write(item)
+        text_file.write("\n")
+
+    text_file.close()
