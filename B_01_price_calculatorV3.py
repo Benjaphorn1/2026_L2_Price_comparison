@@ -2,12 +2,14 @@ import pandas
 from tabulate import tabulate
 from datetime import date
 
+
 def make_statement(statement, decoration):
     """Emphasises headings by adding decoration
     at the start and end"""
     # Create the string and return it
     heading = f"{decoration * 3} {statement} {decoration * 3}"
     return heading
+
 
 def not_blank(question):
     """Checks that a user response is not blank"""
@@ -19,6 +21,7 @@ def not_blank(question):
             return response
 
         print("Sorry, this can't be blank. Please try again.\n")
+
 
 def yes_no_check(question):
     """Checks that users enter yes / no / y / n"""
@@ -33,6 +36,7 @@ def yes_no_check(question):
             return "no"
 
         print(f"Please answer yes or no ")
+
 
 def num_check(question, num_type="float", exit_code=None):
     """Checks that response is a float / integer more than zero"""
@@ -67,6 +71,7 @@ def num_check(question, num_type="float", exit_code=None):
         except ValueError:
             print(error)
 
+
 def instructions():
     """Displays instructions"""
     make_statement("Instructions", "ℹ️")
@@ -76,7 +81,7 @@ def instructions():
     - The names of your products
     - The weight of your product in g/kg or ml/l
     - Get the cost of that product
-    
+
 Please make sure that you enter the abbreviation of the unit for 
 example: kg - kilogram, l - litres, g - grams, ml - millilitre
 
@@ -95,6 +100,7 @@ The data will also be written to a text file which has the
 same name as today's date and your chosen file name.
 
     ''')
+
 
 def get_input(question):
     """Gets number and detects unit if its entered"""
@@ -142,6 +148,7 @@ def get_input(question):
         except ValueError:
             print("Please enter a valid amount")
 
+
 def unit_pick(amount):
     """Decides unit if user didn't enter one"""
 
@@ -175,6 +182,7 @@ def unit_pick(amount):
             else:
                 print("Please enter kg or L")
 
+
 def convert_units(amount, unit):
     """Converts everything to kg or L"""
 
@@ -190,6 +198,7 @@ def convert_units(amount, unit):
     elif unit == "l":
         return amount, "L"
 
+
 def comparison_function(lst):
     """Finds and returns the cheapest item (price and name) from a list of (name, price)"""
     # Set starting values using the first item in the list
@@ -203,17 +212,20 @@ def comparison_function(lst):
     # Return the cheapest price and its name
     return lowest_price, cheapest_item_name
 
+
 def format_currency(value):
     """Formats a number into a dollar currency string"""
     return f"${value:.2f}"
+
 
 def format_weight(value):
     """Formats a number to 2 decimal places for weight/volume"""
     return f"{value:.2f}"
 
+
 # Main routine goes here
 
-#lists
+# lists
 all_names = []
 all_weight = []
 all_final_units = []
@@ -296,7 +308,7 @@ else:
     # pandas output dictionary setup
     price_calc_dict = {
         "Name": all_names,
-        weight_colm: all_weight,
+        "weight_colm" : all_weight,
         "Unit": all_final_units,
         "Item costs": all_costs,
         "Unit Costs": all_unit_costs,
@@ -305,8 +317,7 @@ else:
     # Convert to Dataframe format numbers to currency and print grid table
     calc_frame = pandas.DataFrame(price_calc_dict)
 
-    # Formatted safely using the variable name
-    calc_frame[weight_colm] = calc_frame[weight_colm].apply(format_weight)
+    calc_frame["weight_colm"] = calc_frame["weight_colm"].apply(format_weight)
     calc_frame["Item costs"] = calc_frame["Item costs"].apply(format_currency)
     calc_frame["Unit Costs"] = calc_frame["Unit Costs"].apply(format_currency)
 
@@ -314,7 +325,7 @@ else:
         calc_frame, headers="keys", tablefmt="grid", showindex=False
     )
 
-    # Get date for heading and filename
+    #get date for heading and filename
     today = date.today()
 
     day = today.strftime("%d")
