@@ -111,57 +111,57 @@ def get_input(question):
 
         # kilograms
         if response.endswith("kg"):
-            unit = "kg"
-            amount = response[:-2]
+            unit_input = "kg"
+            amount_input = response[:-2]
 
         # grams
         elif response.endswith("g"):
-            unit = "g"
-            amount = response[:-1]
+            unit_input = "g"
+            amount_input = response[:-1]
 
         # millilitres
         elif response.endswith("ml"):
-            unit = "ml"
-            amount = response[:-2]
+            unit_input = "ml"
+            amount_input = response[:-2]
 
         # litres
         elif response.endswith("l"):
-            unit = "l"
-            amount = response[:-1]
+            unit_input = "l"
+            amount_input = response[:-1]
 
         # no unit entered
         else:
-            unit = "unknown"
-            amount = response
+            unit_input = "unknown"
+            amount_input = response
 
         # Check amount is a valid input
         try:
-            amount = float(amount)
+            amount_input = float(amount_input)
 
-            if amount <= 0:
+            if amount_input <= 0:
                 print("Amount must be more than 0")
                 continue
 
             # send values back to main routine
-            return amount, unit
+            return amount_input, unit_input
 
         except ValueError:
             print("Please enter a valid amount")
 
 
-def unit_pick(amount):
+def unit_pick(weight_value):
     """Decides unit if user didn't enter one"""
 
     # Large values above 100 asked if g or ml
-    if amount > 100:
+    if weight_value > 100:
 
         while True:
-            response = input("Is this grams g or millilitres ml? ").lower()
+            unit_response = input("Is this grams g or millilitres ml? ").lower()
 
-            if response in ["g", "grams"]:
+            if unit_response in ["g", "grams"]:
                 return "g"
 
-            elif response in ["ml", "millilitres"]:
+            elif unit_response in ["ml", "millilitres"]:
                 return "ml"
 
             else:
@@ -171,32 +171,32 @@ def unit_pick(amount):
     else:
 
         while True:
-            response = input("Is this kilograms kg or litres L? ").lower()
+            unit_response = input("Is this kilograms kg or litres L? ").lower()
 
-            if response in ["kg", "kilograms"]:
+            if unit_response in ["kg", "kilograms"]:
                 return "kg"
 
-            elif response in ["l", "litres"]:
+            elif unit_response in ["l", "litres"]:
                 return "l"
 
             else:
                 print("Please enter kg or L")
 
 
-def convert_units(amount, unit):
+def convert_units(value, unit_type):
     """Converts everything to kg or L"""
 
-    if unit == "g":
-        return amount / 1000, "kg"
+    if unit_type == "g":
+        return value / 1000, "kg"
 
-    elif unit == "ml":
-        return amount / 1000, "L"
+    elif unit_type == "ml":
+        return value / 1000, "L"
 
-    elif unit == "kg":
-        return amount, "kg"
+    elif unit_type == "kg":
+        return value, "kg"
 
     elif unit == "l":
-        return amount, "L"
+        return value, "L"
 
 
 def comparison_function(lst):
@@ -205,10 +205,10 @@ def comparison_function(lst):
     lowest_price = lst[0][1]
     cheapest_item_name = lst[0][0]
     # Check if the current item's price is cheaper than the lowest so far
-    for item in lst:
-        if item[1] < lowest_price:
-            lowest_price = item[1]
-            cheapest_item_name = item[0]
+    for current_item in lst:
+        if current_item[1] < lowest_price:
+            lowest_price = current_item[1]
+            cheapest_item_name = current_item[0]
     # Return the cheapest price and its name
     return lowest_price, cheapest_item_name
 
@@ -230,7 +230,6 @@ all_names = []
 all_weight = []
 all_final_units = []
 all_costs = []
-all_grams = []
 all_unit_costs = []
 names_unit_costs = []
 
