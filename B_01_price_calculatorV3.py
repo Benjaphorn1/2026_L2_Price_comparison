@@ -177,7 +177,7 @@ def unit_pick(weight_value):
 
 def convert_units(value, unit_type):
     """Converts everything to kg or L"""
-    
+
     # if unit is g divide by 1000 for kg
     if unit_type == "g":
         return value / 1000, "kg"
@@ -185,7 +185,7 @@ def convert_units(value, unit_type):
     # if unit is ml divide by 1000 for l
     elif unit_type == "ml":
         return value / 1000, "l"
-    
+
     # return value if kg
     elif unit_type == "kg":
         return value, "kg"
@@ -265,7 +265,7 @@ while True:
     #convert units to kg/L if needed
     item_weight, new_unit = convert_units(amount, unit)
     # Get item cost
-    item_cost = num_check("Item cost: $", "float", "xxx")
+    item_cost = num_check("Item cost: $", "xxx")
 
     #Calculate unit cost
     unit_cost = item_cost / item_weight
